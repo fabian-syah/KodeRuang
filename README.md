@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧩 KodeRuang
 
-## Getting Started
+Platform komunitas untuk developer — berbagi resource coding (tools, repositori, tutorial, artikel) dengan sistem voting, komentar, bookmark, dan profil pengembang. Dibangun dengan Next.js App Router, Supabase, dan deploy ke Cloudflare Workers via OpenNext.
 
-First, run the development server:
+Live: [koderuang.fabian-syah.workers.dev](https://koderuang.fabian-syah.workers.dev) *(sesuaikan bila URL berubah)*
+
+---
+
+## ✨ Fitur
+
+**Konten & penemuan**
+- **Feed resource** dengan voting (upvote/downvote) dan skor reputasi.
+- **Kategori & stack** — halaman `/category/[slug]` dan `/stack/[slug]` untuk menelusuri berdasarkan topik atau teknologi.
+- **Halaman Trending** — resource terpopuler berdasarkan aktivitas komunitas.
+- **Pencarian & filter** — penyaringan daftar resource.
+
+**Interaksi sosial**
+- **Komentar** pada setiap resource.
+- **Bookmark** — simpan resource ke halaman `/saved`.
+- **Profil publik** — `/user/[username]` dan `/user/me`, lengkap dengan daftar kontribusi dan peringkat.
+- **Sistem reputasi** — poin bertambah dari kontribusi yang divalidasi komunitas.
+
+**Kontribusi & moderasi**
+- **Kirim resource** lewat `/submit`.
+- **Panel admin** — `/admin` untuk moderasi, plus `/admin/reports` untuk menangani laporan.
+- **Laporan konten** — pengguna bisa melaporkan resource bermasalah.
+
+**Asisten AI**
+- **Chat AI terintegrasi** (Vercel AI SDK + Groq) untuk membantu menjawab pertanyaan seputar resource.
+
+## 🧰 Teknologi
+
+| Lapisan | Teknologi |
+|---|---|
+| Framework | Next.js (App Router), React, TypeScript |
+| Basis data & Auth | Supabase (Postgres + Auth + RLS) |
+| AI | Vercel AI SDK (`ai`, `@ai-sdk/react`), Groq |
+| Deploy | Cloudflare Workers via `@opennextjs/cloudflare` |
+| UI | Tailwind CSS, Lucide, React Syntax Highlighter |
+
+## 🚀 Cara Menjalankan Lokal
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Clone
+git clone https://github.com/fabian-syah/KodeRuang.git
+cd KodeRuang
+
+# 2. Pasang dependensi
+npm install
+
+# 3. Variabel lingkungan
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Isi `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+GROQ_API_KEY=your_groq_key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# 4. Siapkan skema basis data
+#    Jalankan salah satu dump SQL berikut di SQL Editor Supabase Anda:
+#    - supabase_schema.sql      (skema utama)
+#    - update_schema_roles_ranking.sql
+#    - fix_reputation_glitch.sql
+#    (schema_dump.sql adalah snapshot lengkap untuk referensi)
 
-## Learn More
+# 5. Jalankan
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Buka [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Skrip tersedia
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Perintah | Fungsi |
+|---|---|
+| `npm run dev` | Server pengembangan |
+| `npm run build` | Build produksi |
+| `npm run preview` | Build + preview Cloudflare secara lokal |
+| `npm run deploy` | Build + deploy ke Cloudflare Workers |
+| `npm run cf-typegen` | Menghasilkan tipe untuk binding Cloudflare |
 
-## Deploy on Vercel
+## 🗄️ Catatan Basis Data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Repositori ini memuat beberapa file SQL di root. Urutan penerapannya:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. `supabase_schema.sql` — skema dasar (tabel, relasi, kebijakan RLS).
+2. `update_schema_roles_ranking.sql` — penambahan peran dan sistem peringkat.
+3. `fix_reputation_glitch.sql` — perbaikan perhitungan reputasi.
+4. `schema_dump.sql` — snapshot lengkap, untuk referensi/verifikasi saja.
+
+## 🔐 Keamanan
+
+- RLS Supabase harus aktif pada semua tabel yang menyimpan data pengguna.
+- Jangan pernah commit `.env.local` atau kunci `SERVICE_ROLE`.
+- Kebijakan moderasi admin bergantung pada kolom peran di tabel profil — pastikan hanya peran yang sah yang bisa mengubahnya.
+
+## 📄 Lisensi
+
+MIT
